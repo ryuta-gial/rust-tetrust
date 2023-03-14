@@ -1,0 +1,3 @@
+# SETUP
+
+cargo run

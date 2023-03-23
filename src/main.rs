@@ -1,12 +1,28 @@
+// 外部ファイルを読み込む
+// モジュールを読み込む
 mod block;
 mod game;
 
+// スレッド間で同じ変数を参照するには、Arcを使用します。
+// 複数のスレッドから同じ変数にアクセスするために使用されます。
 use std::sync::{Arc, Mutex};
 use std::{thread, time};
+// キー入力の取得にはgetch-rsクレートを使用
 use getch_rs::{Getch, Key};
+// 外部ファイルで定義しているものを取り込む
+// use game::*;は、gameモジュール内で定義されたすべての公開されたアイテム（構造体、列挙型、関数、定数など）を現在のスコープにインポートするためのコードです。
 use game::*;
 
 fn main() {
+    // スレッド間で同じ変数を参照するには、Arcを使用します。
+    // これはRcのスレッドセーフ版です。さらに、その変数の中身を変更したいので、
+    // Mutexも使用します。これで、スレッド間で安全に変数の参照/変更ができます。
+    // Game::newは新しいゲームの状態を生成する
+
+    // Gameインスタンスを作成し、
+    // Mutexは、複数のスレッドが同時に変数にアクセスできないようにするために使用する
+    // Arcは複数のスレッドが"同じ"オブジェクトにアクセスできるようにするために使用
+    // game変数は複数のスレッドからアクセスされ、Mutexを介して排他的にアクセスされる必要がある
     let game = Arc::new(Mutex::new(Game::new()));
 
     // 画面クリア
@@ -17,6 +33,7 @@ fn main() {
     // 自然落下処理
     {
         let game = Arc::clone(&game);
+        //新規スレッドを生成するには、thread::spawn関数を呼び出し、新規スレッドで走らせたいコードを含むクロージャ（無名関数）を渡します。
         let _ = thread::spawn(move || {
             loop {
                 // nミリ秒間スリーブする
@@ -59,6 +76,7 @@ fn main() {
                     x: game.pos.x.checked_sub(1).unwrap_or(game.pos.x),
                     y: game.pos.y,
                 };
+                // 現在のブロックを指定された位置に移動する
                 move_block(&mut game, new_pos);
                 draw(&game);
             }
@@ -83,12 +101,14 @@ fn main() {
             Ok(Key::Char('z')) => {
                 // 左回転
                 let mut game = game.lock().unwrap();
+                // ブロックを左に回転
                 rotate_left(&mut game);
                 draw(&game);
             }
             Ok(Key::Char('x')) => {
                 // 右回転
                 let mut game = game.lock().unwrap();
+                                //　ブロックを右に回転
                 rotate_right(&mut game);
                 draw(&game);
             }
@@ -106,6 +126,7 @@ fn main() {
             Ok(Key::Char(' ')) => {
                 // ホールド
                 let mut game = game.lock().unwrap();
+                // 現在のブロックを保持し、新しいブロックを生成する。
                 hold(&mut game);
                 draw(&game);
             }

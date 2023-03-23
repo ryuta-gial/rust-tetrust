@@ -8,7 +8,15 @@ use block_kind::{I, O, S, Z, J, L, T};
 
 pub type BlockColor = usize;
 
+// block_kindモジュールを定義しています。
+// このモジュールには、ブロックの色（BlockColor）に関する定数が含まれています。
+//  それぞれの定数は、特定のブロックの種類に対応しており、
+// NONEは何もない、WALLは壁、GHOSTはゴーストブロック、
+// IはI字型ブロック、OはO字型ブロック、SはS字型ブロック、ZはZ字型ブロック、JはJ字型ブロック、LはL字型ブロック、TはT字型ブロックを表しています。
+
 pub mod block_kind {
+    // superキーワードは、親モジュール（ここではblockモジュール）を指します。pubキーワードは、他のモジュールからアクセス可能であることを示しています。
+    // superを使用してBlockColor型を参照する必要があります。
     pub const NONE:  super::BlockColor = 0;
     pub const WALL:  super::BlockColor = 1;
     pub const GHOST: super::BlockColor = 2;
@@ -36,6 +44,7 @@ pub const COLOR_TABLE: [&str; 10] = [
 ];
 
 // ブロックの種類
+// ブロックの種類の最大値を表す定数を定義しています。
 const BLOCK_KIND_MAX: usize = 7;
 #[derive(Clone, Copy)]
 pub enum BlockKind {
@@ -64,6 +73,7 @@ impl Distribution<BlockKind> for Standard {
 
 // ブロックの形状
 pub type BlockShape = [[usize; 4]; 4];
+// 各ブロックの形状を表す二次元配列を定義しています。
 pub const BLOCKS: [BlockShape; BLOCK_KIND_MAX] = [
     // Iブロック
     [
